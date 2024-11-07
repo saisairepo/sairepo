@@ -1,0 +1,35 @@
+name: Deploy to Minikube
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: docker build -t nginx-website:latest .
+
+      - name: Load Docker image into Minikube
+        run: minikube image load nginx-website:latest
+
+      - name: Deploy to Kubernetes
+        env:
+          KUBECONFIG: /home/runner/.kube/config  # Path to Kubeconfig
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+
+      - name: Verify Deployment
+        env:
+          KUBECONFIG: /home/runner/.kube/config
+        run: kubectl rollout status deployment/nginx-website-deployment
