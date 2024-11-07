@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-website-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-website
+  template:
+    metadata:
+      labels:
+        app: nginx-website
+    spec:
+      containers:
+        - name: nginx-website
+          image: nginx-website:latest  # Use latest version of our image
+          ports:
+            - containerPort: 80
